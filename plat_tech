@@ -1,0 +1,86 @@
+#!/bin/bash
+
+
+items=("Documents" "Downloads" "Pictures" "logs" "backup")
+logfile="logs.txt"
+
+show_system_info() {
+    echo "===== SYSTEM INFORMATION ====="
+    echo "OS Version:"
+    lsb_release -d
+    echo
+    echo "Kernel Version:"
+    uname -r
+    echo
+    echo "Disk Usage:"
+    df -h
+    echo
+    echo "Active Users:"
+    who
+    echo "=============================="
+    echo "[SYSTEM] Sytem info viewed on $(date)" | tee -a "$logfile"
+}
+
+create_folders() {
+  echo "===== CREATING FOLDERS ====="
+	  for dir in "${items[@]}"; do
+		  mkdir -p "$dir"
+		  echo "Created/verified folder: $dir"
+	  done
+
+	echo "[SYSTEM] Platform directories created on $(date)" | tee -a "$logfile"
+}
+
+backup_files() {
+    echo "===== BACKUP FILES ====="
+    backup_dir="$HOME/backup"
+    mkdir -p "$backup_dir"
+
+    files=("$HOME/.bashrc" "$HOME/.profile")
+
+    for file in "${files[@]}"
+    do
+        if [ -f "$file" ]
+        then
+            cp "$file" "$backup_dir"
+            echo "Backed up: $file"
+        else
+            echo "File not found: $file"
+        fi
+    done
+
+    echo "Backup finished."
+    echo "[SYSTEM] Backup created on $(date)" | tee -a "$logfile"
+}
+
+view_logs() {
+    echo "===== LAST 10 SYSTEM LOGS ====="
+    if [ ! -f "$logfile" ]; then
+		  echo "no logs found"
+  	else
+	  	cat "$logfile"
+  	fi
+    echo "================================"
+}
+
+while true
+do
+    echo "========= PLATFORM TOOL ========="
+    echo "1. Show System Info"
+    echo "2. Create Folders"
+    echo "3. Backup Files"
+    echo "4. View Logs"
+    echo "5. Exit"
+    echo "================================="
+    echo -n "Choose 1-5: "
+    read choice
+
+    case $choice in
+        1) show_system_info ;;
+        2) create_folders ;;
+        3) backup_files ;;
+        4) view_logs ;;
+        5) echo "Goodbye!"; exit ;;
+        *) echo "Invalid choice" ;;
+    esac
+done
